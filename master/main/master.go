@@ -58,7 +58,6 @@ func main() {
 		time.Sleep(5 * time.Second)
 	}
 	// 正常退出
-	return
 
 ERR:
 	fmt.Println(err)

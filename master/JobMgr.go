@@ -3,10 +3,9 @@ package master
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
-	"imooc.com/go-corntab/crontab/common"
+	"imooc.com/go-crontab/crontab/common"
 	"time"
 )
 
@@ -74,7 +73,7 @@ func (j *JobMgr) SaveJob(job *common.Job) (oldJob *common.Job, err error) {
 		return
 	}
 
-	// 如果是跟新，那么返回旧值
+	// 如果是更新，那么返回旧值
 	if putResp.PrevKv != nil {
 		if err = json.Unmarshal(putResp.PrevKv.Value, &oldJobObj); err != nil {
 			err = nil
@@ -126,7 +125,6 @@ func (j *JobMgr) ListJob() (jobs []*common.Job, err error) {
 		for _, keyValue = range getResp.Kvs {
 			job = &common.Job{}
 			if err = json.Unmarshal(keyValue.Value, job); err != nil {
-				fmt.Println("unmarshal failed,", err)
 				err = nil
 				continue
 			}

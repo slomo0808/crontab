@@ -2,7 +2,7 @@ package master
 
 import (
 	"encoding/json"
-	"imooc.com/go-corntab/crontab/common"
+	"imooc.com/go-crontab/crontab/common"
 	"net"
 	"net/http"
 	"strconv"
@@ -110,7 +110,6 @@ ERR:
 	if bytes, err = common.BuildResponse(-1, err.Error(), jobList); err == nil {
 		w.Write(bytes)
 	}
-
 }
 
 // 强制杀死任务
@@ -141,6 +140,67 @@ ERR:
 	}
 }
 
+func handleJobLog(w http.ResponseWriter, r *http.Request) {
+	var (
+		jobName    string
+		jobLogs    []*common.JobLog
+		skipParam  string // 翻页参数，从第几条开始
+		limitParam string // 返回多少条
+		skip       int
+		limit      int
+		err        error
+		bytes      []byte
+	)
+	if err = r.ParseForm(); err != nil {
+		goto ERR
+	}
+	jobName = r.Form.Get("name")
+	skipParam = r.Form.Get("skip")
+	limitParam = r.Form.Get("limit")
+	if skip, err = strconv.Atoi(skipParam); err != nil {
+		skip = 0
+	}
+	if limit, err = strconv.Atoi(limitParam); err != nil {
+		limit = 10
+	}
+
+	// 开始查询
+	if jobLogs, err = G_LogMgr.ListLog(jobName, skip, limit); err != nil {
+		goto ERR
+	}
+	// 返回正常应答
+	if bytes, err = common.BuildResponse(0, "succeed", jobLogs); err == nil {
+		w.Write(bytes)
+	}
+	return
+ERR:
+	// 返回异常应答
+	if bytes, err = common.BuildResponse(-1, err.Error(), jobLogs); err == nil {
+		w.Write(bytes)
+	}
+}
+
+func handleWorkerList(w http.ResponseWriter, r *http.Request) {
+	var (
+		ips   []string
+		err   error
+		bytes []byte
+	)
+	if ips, err = G_WorkerMgr.ListWorkers(); err != nil {
+		goto ERR
+	}
+	// 返回正常应答
+	if bytes, err = common.BuildResponse(0, "succeed", ips); err == nil {
+		w.Write(bytes)
+	}
+	return
+ERR:
+	// 返回异常应答
+	if bytes, err = common.BuildResponse(-1, err.Error(), ips); err == nil {
+		w.Write(bytes)
+	}
+}
+
 // 初始化服务
 func InitApiServer() (err error) {
 	var (
@@ -157,6 +217,8 @@ func InitApiServer() (err error) {
 	mux.HandleFunc("/job/delete", handleJobDelete)
 	mux.HandleFunc("/job/list", handleJobList)
 	mux.HandleFunc("/job/kill", handleJobKill)
+	mux.HandleFunc("/job/log", handleJobLog)
+	mux.HandleFunc("/worker/list", handleWorkerList)
 
 	// 静态文件目录
 	staticDir = http.Dir(G_config.WebRoot)

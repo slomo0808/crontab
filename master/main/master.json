@@ -15,5 +15,10 @@
   "etcdDialTimeout": 5000,
 
   "web页面根目录": "静态页面，前后端分离开发",
-  "webRoot": "./webroot"
+  "webRoot": "./webroot",
+
+  "mongodb地址": "采用mongodbUrl",
+  "mongodbUrl": "mongodb://localhost:27017",
+  "mongodb链接超时": "单位毫秒",
+  "mongodbConnectTimeout": 5000
 }

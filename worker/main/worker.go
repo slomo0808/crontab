@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"imooc.com/go-crontab/crontab/master"
+	"imooc.com/go-crontab/crontab/worker"
 	"runtime"
 	"time"
 )
@@ -14,12 +14,12 @@ var (
 
 // 解析命令行参数
 func initArgs() {
-	// master -config ./master.json
-	// master -h
+	// worker -config ./master.json
+	// worker -h
 	flag.StringVar(&confFile,
 		"config",
-		"./master.json",
-		"指定master.json")
+		"./worker.json",
+		"指定worker.json")
 
 	flag.Parse()
 }
@@ -40,28 +40,32 @@ func main() {
 	initEnv()
 
 	// 加载配置
-	if err = master.InitConfig(confFile); err != nil {
-		fmt.Println(err)
+	if err = worker.InitConfig(confFile); err != nil {
 		goto ERR
 	}
 
-	// 加载workerMGr
-	if err = master.InitWorkerMgr(); err != nil {
+	// 注册服务
+	if err = worker.InitRegister(); err != nil {
 		goto ERR
 	}
 
-	// 日志管理器
-	if err = master.InitLogMgr(); err != nil {
+	// 启动日志协程
+	if err = worker.InitLogSink(); err != nil {
 		goto ERR
 	}
 
-	// 任务管理器
-	if err = master.InitJobMgr(); err != nil {
+	// 加载执行器
+	if err = worker.InitExcutor(); err != nil {
 		goto ERR
 	}
 
-	// 启动API HTTP服务
-	if err = master.InitApiServer(); err != nil {
+	// 启动调度器
+	if err = worker.InitScheduler(); err != nil {
+		goto ERR
+	}
+
+	// 初始化任务管理器
+	if err = worker.InitJobMgr(); err != nil {
 		goto ERR
 	}
 

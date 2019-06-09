@@ -1,0 +1,18 @@
+{
+  "ETCD集群列表": "配置多个，避免单点故障",
+  "etcdEndPoints": ["localhost:2379"],
+
+  "ETCD链接超时": "单位毫秒",
+  "etcdDialTimeout": 5000,
+
+  "mongodb地址": "采用mongodbUrl",
+  "mongodbUrl": "mongodb://localhost:27017",
+  "mongodb链接超时": "单位毫秒",
+  "mongodbConnectTimeout": 5000,
+
+  "mongodb一次写入的日志批次大小": "为了减少mongodb往返",
+  "jobLogBatchSize": 100,
+
+  "日志自动提交超时": "在批次未达到阈值之前，超时会自动提交batch",
+  "jobLogCommitTimeout": 1000
+}

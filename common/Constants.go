@@ -7,6 +7,20 @@ const (
 	// 杀死任务目录
 	JOB_KILLER_DIR = "/cron/killer/"
 
+	// 任务锁目录
+	JOB_LOCK_DIR = "/cron/lock/"
+
+	// 服务注册目录
+	JOB_WORKER_DIR = "/cron/workers/"
+
 	// Killer租约过期时间
 	KillerLeaseTimeout = 1
+
+	// jobEvent变化事件类型
+	// 保存任务事件
+	JOB_EVENT_SAVE = 1
+	// 删除任务事件
+	JOB_EVENT_DELETE = 2
+	// 杀死事件类型
+	JOB_EVENT_KILL = 3
 )
